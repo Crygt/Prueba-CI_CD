@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: visits-api
+  labels:
+    app: visits-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: visits-api
+  template:
+    metadata:
+      labels:
+        app: visits-api
+    spec:
+      containers:
+        - name: visits-api
+          image: crygt/visits-api:latest  # Reemplaza con tu imagen Docker
+          ports:
+            - containerPort: 3001
+          envFrom:
+            - configMapRef:
+                name: visits-api-config
+            - secretRef:
+                name: visits-api-secret
+          resources:
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
