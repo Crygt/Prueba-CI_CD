@@ -1,0 +1,15 @@
+# empujar la imagen construida a un registro Docker.
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: push-docker-image
+spec:
+  params:
+    - name: IMAGE
+      type: string
+  steps:
+    - name: push
+      image: docker:latest
+      script: |
+        #!/bin/sh
+        docker push $(params.IMAGE)

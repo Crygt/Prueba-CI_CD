@@ -6,25 +6,7 @@ spec:
   tasks:
     - name: build-image
       taskRef:
-        name: buildah
-      resources:
-        inputs:
-          - name: source
-            resource: git-source
-        outputs:
-          - name: image
-            resource: docker-image
-      params:
-        - name: IMAGE
-          value: "crygt/visits-api:latest"
-
-    - name: push-image
-      taskRef:
-        name: push-image
-      resources:
-        inputs:
-          - name: image
-            resource: docker-image
+        name: build-docker-image
       params:
         - name: IMAGE
           value: "crygt/visits-api:latest"
@@ -34,6 +16,6 @@ spec:
         name: kubectl-deploy
       params:
         - name: KUBERNETES_CLUSTER
-          value: "<your_k8s_cluster>"
+          value: "minikube"
         - name: DEPLOYMENT_FILE
           value: "visits-api-deployment.yaml"
