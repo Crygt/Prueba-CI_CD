@@ -1,0 +1,23 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: kubectl-deploy
+spec:
+  workspaces:
+    - name: source
+  params:
+    - name: DEPLOYMENT_FILE
+      type: string
+  steps:
+    - name: deploy
+      image: bitnami/kubectl:latest
+      script: |
+        #!/bin/sh
+        echo "Verificando archivos en /workspace/source"
+        ls -l /workspace/source
+        if [ ! -f "/workspace/source/$(params.DEPLOYMENT_FILE)" ]; then
+          echo "Copiando deployment.yaml desde ConfigMap"
+          kubectl get configmap deployment-config -o jsonpath='{.data.deployment\.yaml}' > /workspace/source/$(params.DEPLOYMENT_FILE)
+        fi
+        echo "Aplicando el archivo de despliegue: $(params.DEPLOYMENT_FILE)"
+        kubectl apply -f /workspace/source/$(params.DEPLOYMENT_FILE)

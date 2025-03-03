@@ -16,14 +16,36 @@ spec:
     spec:
       containers:
         - name: visits-api
-          image: crygt/visits-api:latest  # Reemplaza con tu imagen Docker
+          image: crygt/visits-api:latest  # Imagen de Docker Hub
+          imagePullPolicy: Always  
           ports:
             - containerPort: 3001
-          envFrom:
-            - configMapRef:
-                name: visits-api-config
-            - secretRef:
-                name: visits-api-secret
+          env:
+            - name: DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: visits-api-config
+                  key: DB_HOST
+            - name: DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: visits-api-config
+                  key: DB_NAME
+            - name: DB_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: visits-api-config
+                  key: DB_PORT
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: visits-api-secret
+                  key: DB_USER
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: visits-api-secret
+                  key: DB_PASSWORD
           resources:
             limits:
               memory: "512Mi"

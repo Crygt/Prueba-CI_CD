@@ -3,7 +3,7 @@ kind: ConfigMap
 metadata:
   name: visits-api-config
 data:
-  DB_HOST: "postgres-service"
+  DB_HOST: "postgres-service.default.svc.cluster.local"
   DB_NAME: "pruebaci"
   DB_PORT: "5432"
   PORT: "3001"

@@ -3,19 +3,46 @@ kind: Pipeline
 metadata:
   name: build-and-deploy-api
 spec:
+  workspaces:
+    - name: source  # Asegúrate de que este nombre sea consistente en todo el pipeline
   tasks:
+    - name: git-clone
+      taskRef:
+        name: git-clone-task
+      params:
+        - name: url
+          value: "https://github.com/Crygt/Prueba-CI_CD.git"
+        - name: revision
+          value: "main"
+        - name: subdirectory
+          value: ""
+      workspaces:
+        - name: source  # Aquí asegúrate de que coincida con el workspace en la tarea
+          workspace: source
+    - name: docker-login
+      taskRef:
+        name: docker-login-task
+      runAfter:
+        - git-clone
     - name: build-image
       taskRef:
         name: build-docker-image
       params:
         - name: IMAGE
           value: "crygt/visits-api:latest"
-
+      workspaces:
+        - name: source
+          workspace: source
+      runAfter:
+        - docker-login
     - name: deploy-api
       taskRef:
         name: kubectl-deploy
       params:
-        - name: KUBERNETES_CLUSTER
-          value: "minikube"
         - name: DEPLOYMENT_FILE
-          value: "visits-api-deployment.yaml"
+          value: "deployment.yaml"
+      workspaces:
+        - name: source
+          workspace: source
+      runAfter:
+        - build-image

@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:  # <-- Esta línea estaba mal alineada
+      containers:
+        - name: postgres
+          image: postgres:latest
+          imagePullPolicy: Always
+          env:
+            - name: POSTGRES_DB
+              value: "pruebaci"
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: visits-api-secret
+                  key: DB_USER
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: visits-api-secret
+                  key: DB_PASSWORD
+          ports:
+            - containerPort: 5432

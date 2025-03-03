@@ -1,0 +1,25 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: docker-login-task
+spec:
+  steps:
+    - name: docker-login
+      image: docker.io/library/docker:latest
+      script: |
+        #!/bin/sh
+        set -e  # Hacer que el script falle si hay un error
+        echo "Iniciando autenticación en Docker Hub con el usuario: $DOCKER_USERNAME..."
+        echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+        echo "Autenticación completada con éxito en Docker Hub."
+      env:
+        - name: DOCKER_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: docker-hub-secret
+              key: username  # Hace referencia al campo "username" dentro del Secret "docker-hub-secret"
+        - name: DOCKER_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: docker-hub-secret
+              key: password  # Hace referencia al campo "password" dentro del Secret "docker-hub-secret"

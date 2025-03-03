@@ -1,0 +1,35 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: git-clone-task
+spec:
+  workspaces:
+    - name: source
+  params:
+    - name: url
+      type: string
+      description: "URL del repositorio a clonar"
+    - name: subdirectory
+      type: string
+      description: "Directorio donde clonar el repo"
+      default: ""
+  steps:
+    - name: step-git-clone
+      image: gcr.io/cloud-builders/git
+      script: |
+        #!/bin/sh
+        echo "🛠 Eliminando el contenido previo en $(workspaces.source.path)/$(params.subdirectory)..."
+        rm -rf "$(workspaces.source.path)/$(params.subdirectory)"
+        mkdir -p "$(workspaces.source.path)/$(params.subdirectory)"
+        echo "✅ Directorio limpio. Clonando el repositorio..."
+        git clone "$(params.url)" "$(workspaces.source.path)/$(params.subdirectory)"
+      securityContext:
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop:
+            - ALL
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
